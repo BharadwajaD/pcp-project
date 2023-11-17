@@ -15,20 +15,15 @@ import (
 func get_input(input_file string) string {
 	var input string
 	if input_file == "" {
-		input, err := os.Getwd()
-		if err != nil {
-            log.Fatal("get_input:1:", err)
-		}
 
-		input = filepath.Join(input, "datasets", "input.txt")
-		log.Println(input)
+		input = filepath.Join("datasets", "input.txt")
 	} else {
 		input = input_file
 	}
 
 	data, err := os.ReadFile(input)
 	if err != nil {
-        log.Fatal("get_input:2:", err)
+        log.Fatal(err)
 	}
 
 	input = string(data)
@@ -57,7 +52,9 @@ func main() {
 
 	input := get_input(*input_file)
 	graph_input := strings.Split(input, "\n")
-	_ = graph.NewGraphEdges(&graph_input)
+
+    gedj := graph.NewGraphEdges(&graph_input)
+    gedj.Kruskal(ctx)
 
 	gadj := graph.NewGraphAdj(&graph_input)
 	gadj.Boruvaka(ctx)
