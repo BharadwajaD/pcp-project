@@ -47,7 +47,20 @@ func (uf *UnionFind) Union(element1, element2 int) {
 	}
 }
 
-// Connected checks if the given two elements are in the same set.
-func (uf *UnionFind) Connected(element1, element2 int) bool {
-	return uf.Find(element1) == uf.Find(element2)
+// GetNodesInComponent returns all the nodes present in the component containing the given element.
+func (uf *UnionFind) GetNodesInComponent(element int) []int {
+	componentNodes := make([]int, 0)
+
+	// Find the root of the component
+	root := uf.Find(element)
+
+	// Iterate through all elements and add those with the same root to the componentNodes
+	for i := 0; i < len(uf.root); i++ {
+		if uf.Find(i) == root {
+			componentNodes = append(componentNodes, i)
+		}
+	}
+
+	return componentNodes
 }
+

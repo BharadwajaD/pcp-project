@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/theTechTrailBlazer/pcp-project/pkg/graph"
@@ -54,9 +56,20 @@ func main() {
 
 	input := get_input(*input_file)
 	graph_input := strings.Split(input, "\n")
+    nvertices,_ := strconv.Atoi(graph_input[0])
+    graph_input = graph_input[1:]
 
-    gedj := graph.NewGraphEdgesString(&graph_input)
-    gedj.Boruvaka(ctx)
+    //graphAdj := graph.NewGraphAdj(nvertices, &graph_input)
+    //graphAdj.PrintGraph()
 
+    graphEdj := graph.NewGraphEdges(nvertices, &graph_input)
+
+    stime := time.Now()
+    elist := graphEdj.Kruskal(ctx)
+    etime := time.Now()
+    fmt.Println(elist)
+    fmt.Printf("Time taken: %v\n", etime.Sub(stime))
 
 }
+
+
