@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -31,16 +32,17 @@ func get_input(input_file string) string {
 	return input
 }
 
-func write_output(output_file string, content *string) {
-}
-
 func main() {
 
     err := godotenv.Load()
     if err != nil {
         log.Fatal("Error loading .env file")
     }
-    thread_count := os.Getenv("THREAD_COUNT")
+
+    thread_count, err := strconv.Atoi(os.Getenv("THREAD_COUNT"))
+    if err != nil {
+		log.Fatalln("THREAD_COUNT is not int")
+    }
 
 	input_file := flag.String("input", "", "input dataset file")
 	//ouput_file := flag.String("output", "", "output file")
@@ -53,10 +55,8 @@ func main() {
 	input := get_input(*input_file)
 	graph_input := strings.Split(input, "\n")
 
-    gedj := graph.NewGraphEdges(&graph_input)
-    gedj.Kruskal(ctx)
+    gedj := graph.NewGraphEdgesString(&graph_input)
+    gedj.Boruvaka(ctx)
 
-	gadj := graph.NewGraphAdj(&graph_input)
-	gadj.Boruvaka(ctx)
 
 }
