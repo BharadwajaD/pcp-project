@@ -34,6 +34,15 @@ func get_input(input_file string) string {
 	return input
 }
 
+// PrintMST prints the Minimum Spanning Tree (MST).
+func PrintMST(mstEdges [][]int) {
+	fmt.Println("Minimum Spanning Tree (MST):")
+	for _, edge := range mstEdges {
+		u, v, wt := edge[0], edge[1], edge[2]
+		fmt.Printf("%d - %d : %d\n", u, v, wt)
+	}
+}
+
 func main() {
 
     err := godotenv.Load()
@@ -47,7 +56,7 @@ func main() {
     }
 
 	input_file := flag.String("input", "", "input dataset file")
-	//ouput_file := flag.String("output", "", "output file")
+	algo := flag.String("algo", "kruskal", "alogrithm to construct mst")
 	flag.Parse()
 
     ctx := context.Background()
@@ -59,17 +68,24 @@ func main() {
     nvertices,_ := strconv.Atoi(graph_input[0])
     graph_input = graph_input[1:]
 
-    //graphAdj := graph.NewGraphAdj(nvertices, &graph_input)
-    //graphAdj.PrintGraph()
-
     graphEdj := graph.NewGraphEdges(nvertices, &graph_input)
+    graphAdjMatrix := graph.NewGraphAdjMatrix(nvertices, &graph_input)
 
-    stime := time.Now()
-    elist := graphEdj.Kruskal(ctx)
-    etime := time.Now()
-    fmt.Println(elist)
-    fmt.Printf("Time taken: %v\n", etime.Sub(stime))
+    var mst [][]int
 
+    start_time := time.Now()
+
+    if *algo == "prims" {
+        mst = graphAdjMatrix.Prims(ctx)
+    }else if *algo == "boruvaka"{
+        mst = graphEdj.Boruvaka(ctx)
+    }else{
+        mst = graphEdj.Kruskal(ctx)
+    }
+
+    end_time := time.Now()
+
+    _ = mst
+    //PrintMST(mst)
+    log.Printf("Time taken by %s algo is %v\n", *algo, end_time.Sub(start_time))
 }
-
-

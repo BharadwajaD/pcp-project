@@ -1,4 +1,4 @@
-package graph
+package utils
 
 // UnionFind represents the Union-Find (Disjoint Set) data structure.
 type UnionFind struct {
@@ -44,6 +44,14 @@ func (uf *UnionFind) Union(element1, element2 int) {
 			uf.root[root2] = root1
 			uf.rank[root1]++
 		}
+	}
+}
+
+// Reset the Union-Find data structure
+func (uf *UnionFind) Reset() {
+	for i := range uf.root {
+		uf.root[i] = i
+		uf.rank[i] = 0
 	}
 }
 

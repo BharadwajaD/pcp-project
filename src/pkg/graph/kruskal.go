@@ -5,8 +5,27 @@ import (
 	"log"
 	"sort"
 	"sync"
+
+	"github.com/theTechTrailBlazer/pcp-project/pkg/utils"
 )
 
+
+
+type kruskalUtil struct{
+    ufs []utils.UnionFind;
+}
+
+func newKruskalUtil(ntasks, nvertices int) kruskalUtil {
+    var ufs []utils.UnionFind
+
+    for i := 0; i < ntasks; i++ {
+        ufs = append(ufs, *utils.NewUnionFind(nvertices))
+    }
+
+    return kruskalUtil{
+        ufs: ufs,
+    }
+}
 
 func split_edge_list(edjlist [][]int, nsplits int) [][][]int {
     var splits [][][]int
@@ -19,10 +38,14 @@ func split_edge_list(edjlist [][]int, nsplits int) [][][]int {
     return splits
 }
 
-func mstLocal(edjlist [][]int, nvertices int, uf *UnionFind) [][]int {
+func (k *kruskalUtil)mstLocal(edjlist [][]int, nvertices int, tid int) [][]int {
+
 	sort.Slice(edjlist, func(i, j int) bool {
 		return edjlist[i][2] < edjlist[j][2]
 	})
+
+    uf := k.ufs[tid]
+    defer uf.Reset()
 
 	var mstEdges [][]int
 
@@ -51,8 +74,7 @@ func (g *GraphEdges) Kruskal(ctx context.Context) [][]int {
 	var wg sync.WaitGroup
 	elist := g.EdgesList
 	var elistMutex sync.Mutex
-
-	uf := NewUnionFind(g.NVertices)
+    k := newKruskalUtil(ntasks, g.NVertices)
 
 	for ntasks > 0 {
 		splits := split_edge_list(elist, ntasks)
@@ -63,7 +85,7 @@ func (g *GraphEdges) Kruskal(ctx context.Context) [][]int {
 			go func(tid int) {
 				defer wg.Done()
 
-				localElist := mstLocal(splits[tid], g.NVertices, uf)
+				localElist := k.mstLocal(splits[tid], g.NVertices, tid)
 
 				// Use a mutex to protect concurrent append to the global elist
 				elistMutex.Lock()
@@ -73,20 +95,9 @@ func (g *GraphEdges) Kruskal(ctx context.Context) [][]int {
 		}
 
 		wg.Wait()
-
-		// Reset the Union-Find data structure for the next iteration
-		uf.Reset()
-
 		ntasks /= 2
 	}
 
 	return elist
 }
 
-// Reset the Union-Find data structure
-func (uf *UnionFind) Reset() {
-	for i := range uf.root {
-		uf.root[i] = i
-		uf.rank[i] = 0
-	}
-}

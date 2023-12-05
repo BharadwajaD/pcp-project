@@ -29,9 +29,8 @@ func NewGraphAdj(nvertices int, input *[]string) GraphAdj {
 		wt, _ := strconv.Atoi(val[2])
 
 		adj_list[u-1] = append(adj_list[u-1], []int{v-1, wt})
+		adj_list[v-1] = append(adj_list[v-1], []int{u-1, wt})
 	}
-
-    fmt.Println(adj_list)
 
 	return GraphAdj{
         Nvertices: nvertices,
@@ -81,4 +80,32 @@ func (g *GraphEdges) PrintGraph() {
 	for _, edge := range g.EdgesList {
         fmt.Println(edge)
 	}
+}
+
+type GraphAdjMatrix struct{
+    Nvertices int
+    AdjMatrix [][]int
+}
+
+func NewGraphAdjMatrix(nvertices int, input *[]string) GraphAdjMatrix {
+    var adjmatrix [][]int
+
+    for i := 0; i < nvertices; i++ {
+        adjmatrix = append(adjmatrix, make([]int, nvertices))
+    }
+
+	input_ := *input
+	for _, e := range input_[:len(*input)-1] {
+		val := strings.Split(e, " ")
+		u, _ := strconv.Atoi(val[0])
+		v, _ := strconv.Atoi(val[1])
+		wt, _ := strconv.Atoi(val[2])
+
+        adjmatrix[u-1][v-1] = wt
+	}
+
+    return GraphAdjMatrix{
+        Nvertices: nvertices,
+        AdjMatrix: adjmatrix,
+    }
 }
